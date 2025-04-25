@@ -5,7 +5,7 @@
 
 const int ledPins[5] = {2, 4, 5, 18, 19};
 
-#define SERVICE_UUID        "12345678-1234-1234-1234-1234567890ab"
+#define SERVICE_UUID        "12345678-1234-1234-1234-123456789abc"
 #define CHARACTERISTIC_UUID "abcd1234-5678-90ab-cdef-1234567890ab"
 
 BLECharacteristic *pCharacteristic;
@@ -21,18 +21,18 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
-
 class MyCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
-    std::string value = pCharacteristic->getValue();
+    String value = pCharacteristic->getValue();
 
-    if (value.length() > 0) {
-      for (int i = 0; i < 5 && i < value.length(); i++) {
-        if (value[i] == '1') {
-          digitalWrite(ledPins[i], HIGH);
-        } else {
-          digitalWrite(ledPins[i], LOW);
-        }
+    if (value.length() == 2) {
+      char action = value[0]; // '1' o '0'
+      int pinNumber = value[1] - '1'; // Convertir a índice (0-4)
+      
+      if (pinNumber >= 0 && pinNumber < 5) {
+        digitalWrite(ledPins[pinNumber], action == '1' ? HIGH : LOW);
+        Serial.print("LED "); Serial.print(pinNumber + 1); 
+        Serial.println(action == '1' ? " ON" : " OFF");
       }
     }
   }
